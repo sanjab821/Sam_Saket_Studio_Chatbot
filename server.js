@@ -21,6 +21,8 @@ const promptIntro = {
   fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
 };
 
+const systemPrompt = `${promptIntro[lang] || promptIntro["de"]}
+
 // In-Memory Gesprächsverlauf pro Session (einfaches Beispiel, NICHT für echte Benutzertrennung geeignet)
 let conversationHistory = [
   {
