@@ -24,6 +24,7 @@ const promptIntro = {
 app.post("/chat", async (req, res) => {
   const userMessage = req.body.message;
   const lang = req.body.lang || "de";
+  console.log("Sprache erkannt:", lang);
 
   const systemPrompt = `${promptIntro[lang]}
 
