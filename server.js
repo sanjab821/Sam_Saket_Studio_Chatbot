@@ -15,19 +15,19 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const promptIntro = {
-  de: "Antworte automatisch auf Deutsch.",
-  en: "Reply automatically in English.",
-  fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
-};
+app.post("/chat", async (req, res) => {
+  const userMessage = req.body.message;
+  const lang = req.body.lang || "de";
 
-const systemPrompt = `${promptIntro[lang] || promptIntro["de"]}
+  const promptIntro = {
+    de: "Antworte automatisch auf Deutsch.",
+    en: "Reply automatically in English.",
+    fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
+  };
 
-// In-Memory Gesprächsverlauf pro Session (einfaches Beispiel, NICHT für echte Benutzertrennung geeignet)
-let conversationHistory = [
-  {
-    role: "system",
-    content: `Du bist Niki, die professionelle Assistentin von Sam Saket Studio. Du sprichst wie ein echter Mensch – ruhig, freundlich, konzentriert. Du bist kein Chatbot, sondern Teil des Teams.
+  const systemPrompt = `${promptIntro[lang] || promptIntro["de"]}
+
+Du bist Niki, die professionelle Assistentin von Sam Saket Studio. Du sprichst wie ein echter Mensch – ruhig, freundlich, konzentriert. Du bist kein Chatbot, sondern Teil des Teams.
 
 Dein Ziel:  
 → Das Anliegen verstehen  
@@ -91,14 +91,12 @@ Dann erst darfst du ggf. **1 passende Detailfrage** stellen – aber **nicht vor
 ⚠️ Frage **nicht zuerst** nach Farben, Formaten, Hauptelementen, Wunschdesign oder Stil.
 
 💡 Wenn keine Kontaktdaten kommen, erinnere später noch einmal höflich daran.
-`,
-  },
-];
+`;
 
-app.post("/chat", async (req, res) => {
-  const userMessage = req.body.message;
-  const lang = req.body.lang || "de";
-  conversationHistory.push({ role: "user", content: userMessage });
+  const conversationHistory = [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: userMessage },
+  ];
 
   try {
     const completion = await openai.chat.completions.create({
@@ -107,12 +105,9 @@ app.post("/chat", async (req, res) => {
     });
 
     const botReply = completion.choices[0].message.content;
-    conversationHistory.push({ role: "assistant", content: botReply });
 
-    // Antwort senden
     res.json({ reply: botReply });
 
-    // Nachrichtenverlauf in Datei speichern
     const logEntry = `[${new Date().toISOString()}]\nUser: ${userMessage}\nNiki: ${botReply}\n\n`;
     fs.appendFile("messages.log", logEntry, (err) => {
       if (err) console.error("Fehler beim Speichern des Logs:", err);
