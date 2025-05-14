@@ -15,6 +15,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const promptIntro = {
+  de: "Antworte automatisch auf Deutsch.",
+  en: "Reply automatically in English.",
+  fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
+};
+
 // In-Memory Gesprächsverlauf pro Session (einfaches Beispiel, NICHT für echte Benutzertrennung geeignet)
 let conversationHistory = [
   {
@@ -89,6 +95,7 @@ Dann erst darfst du ggf. **1 passende Detailfrage** stellen – aber **nicht vor
 
 app.post("/chat", async (req, res) => {
   const userMessage = req.body.message;
+  const lang = req.body.lang || "de";
   conversationHistory.push({ role: "user", content: userMessage });
 
   try {
