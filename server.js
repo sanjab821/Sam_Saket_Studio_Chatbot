@@ -15,17 +15,17 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const promptIntro = {
+  de: "Antworte automatisch auf Deutsch.",
+  en: "Reply automatically in English.",
+  fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
+};
+
 app.post("/chat", async (req, res) => {
   const userMessage = req.body.message;
   const lang = req.body.lang || "de";
 
-  const promptIntro = {
-    de: "Antworte automatisch auf Deutsch.",
-    en: "Reply automatically in English.",
-    fa: "پاسخ‌ها را به صورت خودکار به زبان فارسی بنویس.",
-  };
-
-  const systemPrompt = `${promptIntro[lang] || promptIntro["de"]}
+  const systemPrompt = `${promptIntro[lang]}
 
 Du bist Niki, die professionelle Assistentin von Sam Saket Studio. Du sprichst wie ein echter Mensch – ruhig, freundlich, konzentriert. Du bist kein Chatbot, sondern Teil des Teams.
 
@@ -108,7 +108,7 @@ Dann erst darfst du ggf. **1 passende Detailfrage** stellen – aber **nicht vor
 
     res.json({ reply: botReply });
 
-    const logEntry = `[${new Date().toISOString()}]\nUser: ${userMessage}\nNiki: ${botReply}\n\n`;
+    const logEntry = `[${new Date().toISOString()}]\nSprache: ${lang}\nUser: ${userMessage}\nNiki: ${botReply}\n\n`;
     fs.appendFile("messages.log", logEntry, (err) => {
       if (err) console.error("Fehler beim Speichern des Logs:", err);
     });
