@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
@@ -8,6 +9,11 @@ const { OpenAI } = require("openai");
 dotenv.config();
 const app = express();
 const port = 3000;
+
+app.use(cors({
+  origin: "https://www.samsaketstudio.com"
+}));
+
 
 app.use(bodyParser.json());
 app.use(express.static("public"));
